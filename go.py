@@ -2,8 +2,10 @@ from datetime import datetime
 from decimal import Decimal
 import locale
 import os
+from pydantic import utils
 
 import tinvest
+from tinvest.schemas import Currency
 
 from tinkoffapi import TinkoffApi
 
@@ -45,8 +47,11 @@ def get_sum_pay_in() -> int:
 
     sum_pay_in = Decimal('0')
     for operation in operations:
-        if operation.operation_type.value == "PayIn":
-            sum_pay_in += Decimal(str(operation.payment))
+        if operation.operation_type.value == "PayIn" or operation.operation_type.value == "PayOut":
+            if operation.currency == Currency.usd:
+                sum_pay_in += Decimal(str(operation.payment)) * api.get_usd_course()
+            else:
+                sum_pay_in += Decimal(str(operation.payment))
     return int(sum_pay_in)
 
 

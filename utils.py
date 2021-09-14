@@ -9,5 +9,3 @@ def localize(d: datetime) -> datetime:
 
 def get_now() -> datetime:
     return localize(datetime.now())
-
-
