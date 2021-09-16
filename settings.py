@@ -10,6 +10,11 @@ BROKER_ACCOUNT_ID = os.getenv('TINKOFF_BROKER_ACCOUNT')
 # Дата, от которой будут получены пополнения портфеля
 BROKER_ACCOUNT_STARTED_AT = datetime.strptime(os.getenv('TINKOFF_ACCOUNT_STARTED'),
                                               '%d.%m.%Y')
+
 # Местоположение таблицы, куда складывать данные
 CSV_NAME = 'stats.csv'
 CSV_DIR = Path('./data/')
+
+# Настройки телеграм-бота
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')

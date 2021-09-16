@@ -9,13 +9,19 @@ from tinvest.schemas import Currency
 
 from tinkoffapi import TinkoffApi
 from settings import TOKEN, BROKER_ACCOUNT_ID, BROKER_ACCOUNT_STARTED_AT
-from utils import add_to_csv
+from utils import add_to_csv, get_now
+import bot
+from random_emoji import random_emoji
 
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 api = TinkoffApi(api_token=TOKEN, broker_account_id=BROKER_ACCOUNT_ID)
 usd_course = api.get_usd_course()
-print(f"Текущий курс доллара в брокере: {usd_course} руб")
+message_template = (f"{random_emoji()[0]} Отчет за {get_now().date()}:\n"
+                    f"- Текущий курс доллара: {usd_course} руб\n"
+                    "- Пополнения: {sum_pay_in} руб\n"
+                    "- Текущая рублёвая стоимость портфеля: {portfolio_sum} руб\n"
+                    "- Рублёвая прибыль: {profit_in_rub} руб ({profit_in_percent}%)")
 
 
 def get_portfolio_sum() -> int:
@@ -55,6 +61,15 @@ if __name__ == "__main__":
     profit_in_rub = portfolio_sum - sum_pay_in
     profit_in_percent = 100 * round(profit_in_rub / sum_pay_in, 4)
     add_to_csv(sum_pay_in, portfolio_sum, profit_in_rub, profit_in_percent, float(api.get_usd_course()))
-    print(f"Пополнения: {sum_pay_in:n} руб\n"
-          f"Текущая  рублёвая стоимость портфеля: {portfolio_sum:n} руб\n"
-          f"Рублёвая прибыль: {profit_in_rub:n} руб ({profit_in_percent:n}%)")
+
+    bot.send_message(
+        message_template.format(
+            sum_pay_in=sum_pay_in, 
+            portfolio_sum=portfolio_sum, 
+            profit_in_rub=profit_in_rub,
+            profit_in_percent=profit_in_percent)
+        )
+            
+    # print(f"Пополнения: {sum_pay_in:n} руб\n"
+    #       f"Текущая рублёвая стоимость портфеля: {portfolio_sum:n} руб\n"
+    #       f"Рублёвая прибыль: {profit_in_rub:n} руб ({profit_in_percent:n}%)")
